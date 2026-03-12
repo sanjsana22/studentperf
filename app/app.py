@@ -18,8 +18,8 @@ st.set_page_config(
 # LOAD DATA + MODEL
 # ---------------------------------------------------
 
-df = pd.read_csv("../data/Student_Performance.csv")
-model = pickle.load(open("../model/std_perf.pkl","rb"))
+df = pd.read_csv("data/Student_Performance.csv")
+model = pickle.load(open("model/std_perf.pkl","rb"))
 
 # ---------------------------------------------------
 # UI STYLING
