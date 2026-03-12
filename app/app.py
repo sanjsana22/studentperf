@@ -22,11 +22,23 @@ df = pd.read_csv("../data/Student_Performance.csv")
 model = pickle.load(open("../model/std_perf.pkl","rb"))
 
 # ---------------------------------------------------
-# CUSTOM CSS
+# UI STYLING
 # ---------------------------------------------------
 
 st.markdown("""
 <style>
+
+.stApp{
+background-color:#0B1F3A;
+color:white;
+font-family: 'Segoe UI', sans-serif;
+}
+
+button[data-baseweb="tab"]{
+font-size:22px !important;
+font-weight:700;
+color:white !important;
+}
 
 .title{
 font-size:42px;
@@ -35,44 +47,72 @@ text-align:center;
 margin-bottom:30px;
 }
 
-.card{
-background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0px 4px 12px rgba(0,0,0,0.1);
-height:160px;
-color:black;
-margin-bottom:30px;
+.section-title{
+font-size:30px;
+font-weight:700;
+color:#D6E6FF;
+margin-top:20px;
 }
 
-.card h4{
-color:black;
-margin-bottom:10px;
-}
-
-.card p{
-color:black;
-font-size:15px;
-}
-
-.chart-label{
+.chart-title{
+font-size:20px;
 font-weight:600;
-font-size:18px;
-margin-top:10px;
+color:#D6E6FF;
+}
+
+.stNumberInput input{
+background-color:#EAF2FF;
+color:black !important;
+}
+
+.stSelectbox div{
+background-color:#EAF2FF;
+color:black !important;
+}
+
+.stSelectbox span{
+color:black !important;
+}
+
+/* -------- DROPDOWN ARROW COLOR FIX -------- */
+
+[data-baseweb="select"] svg{
+fill:black !important;
+}
+
+/* ------------------------------------------ */
+
+.stButton button{
+background-color:#4A90E2;
+color:white;
+font-weight:700;
+border-radius:8px;
+padding:8px 22px;
+}
+
+.stButton button:hover{
+background-color:#2E6CB8;
+}
+
+.card{
+background:#1F3A5F;
+padding:25px;
+border-radius:12px;
+box-shadow:0px 6px 16px rgba(0,0,0,0.3);
+height:160px;
+margin-bottom:30px;
+transition:0.3s;
+}
+
+.card:hover{
+background:#4A90E2;
+transform:scale(1.03);
 }
 
 .chart-desc{
-color:gray;
-margin-bottom:40px;
-}
-
-.note-card{
-background:#fff5e6;
-padding:20px;
-border-radius:10px;
-color:black;
-font-size:16px;
-margin-bottom:20px;
+color:#C7DAFF;
+font-size:14px;
+margin-bottom:30px;
 }
 
 </style>
@@ -84,10 +124,6 @@ margin-bottom:20px;
 
 st.markdown('<div class="title">Student Academic Performance Prediction</div>', unsafe_allow_html=True)
 
-# ---------------------------------------------------
-# TABS
-# ---------------------------------------------------
-
 home_tab, pred_tab = st.tabs(["Home","Prediction"])
 
 # ===================================================
@@ -96,16 +132,14 @@ home_tab, pred_tab = st.tabs(["Home","Prediction"])
 
 with home_tab:
 
-    st.subheader("Project Overview")
-
-    col1, col2 = st.columns(2, gap="large")
+    col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("""
         <div class="card">
         <h4>Dataset Overview</h4>
-        <p>Contains student academic data including study habits, sleep hours,
-        extracurricular participation, and previous scores.</p>
+        Student academic dataset including study hours,
+        sleep hours, and exam scores.
         </div>
         """, unsafe_allow_html=True)
 
@@ -113,134 +147,84 @@ with home_tab:
         st.markdown("""
         <div class="card">
         <h4>Machine Learning Model</h4>
-        <p>A Linear Regression model trained to learn relationships
-        between study patterns and academic performance.</p>
+        Linear Regression model predicting
+        academic performance index.
         </div>
         """, unsafe_allow_html=True)
 
-    col3, col4 = st.columns(2, gap="large")
+    col3, col4 = st.columns(2)
 
     with col3:
         st.markdown("""
         <div class="card">
-        <h4>Key Input Features</h4>
-        <p>Hours Studied, Previous Scores, Extracurricular Activities,
-        Sleep Hours and Practice Papers Solved.</p>
+        <h4>Input Features</h4>
+        Hours Studied, Previous Scores,
+        Extracurricular Activities,
+        Sleep Hours, Practice Papers.
         </div>
         """, unsafe_allow_html=True)
 
     with col4:
         st.markdown("""
         <div class="card">
-        <h4>Prediction Objective</h4>
-        <p>Estimate the expected student performance index based
-        on academic behaviour and study patterns.</p>
+        <h4>Prediction Goal</h4>
+        Estimate student performance index
+        using study patterns.
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("---")
-
-
-
 # ---------------------------------------------------
-# DATA VISUALIZATION
+# DATA INSIGHTS
 # ---------------------------------------------------
 
-with home_tab:
+    st.markdown('<div class="section-title">Data Insights</div>', unsafe_allow_html=True)
 
-    st.header("Data Insights from Student Dataset")
+    col1, col2 = st.columns(2)
 
-    # ---------------------------------------------
-    # 1 Hours Studied vs Performance
-    # ---------------------------------------------
+    with col1:
 
-    st.subheader("Performance vs Hours Studied")
+        st.markdown('<div class="chart-title">Study Hours vs Performance</div>', unsafe_allow_html=True)
 
-    hours_perf = df.groupby("Hours Studied")["Performance Index"].mean().reset_index()
+        hours_perf = df.groupby("Hours Studied")["Performance Index"].mean().reset_index()
 
-    fig1 = px.bar(
-        hours_perf,
-        x="Hours Studied",
-        y="Performance Index",
-        title="Average Performance Index for Different Study Hours",
-        color="Performance Index"
-    )
+        fig1 = px.bar(hours_perf,x="Hours Studied",y="Performance Index")
+        st.plotly_chart(fig1,use_container_width=True)
 
-    st.plotly_chart(fig1, use_container_width=True)
+        st.markdown('<div class="chart-desc">Students who study more hours tend to score higher.</div>', unsafe_allow_html=True)
 
-    st.caption(
-        "Insight: Students who study more hours tend to achieve higher performance scores."
-    )
+    with col2:
 
-    st.markdown("---")
+        st.markdown('<div class="chart-title">Sleep Hours vs Performance</div>', unsafe_allow_html=True)
 
-    # ---------------------------------------------
-    # 2 Sleep Hours vs Performance
-    # ---------------------------------------------
+        sleep_perf = df.groupby("Sleep Hours")["Performance Index"].mean().reset_index()
 
-    st.subheader("Performance vs Sleep Hours")
+        fig2 = px.line(sleep_perf,x="Sleep Hours",y="Performance Index",markers=True)
+        st.plotly_chart(fig2,use_container_width=True)
 
-    sleep_perf = df.groupby("Sleep Hours")["Performance Index"].mean().reset_index()
+        st.markdown('<div class="chart-desc">Balanced sleep helps maintain academic performance.</div>', unsafe_allow_html=True)
 
-    fig2 = px.line(
-        sleep_perf,
-        x="Sleep Hours",
-        y="Performance Index",
-        markers=True,
-        title="Effect of Sleep Hours on Student Performance"
-    )
+    col3, col4 = st.columns(2)
 
-    st.plotly_chart(fig2, use_container_width=True)
+    with col3:
 
-    st.caption(
-        "Insight: Students with balanced sleep hours often maintain stable academic performance."
-    )
+        st.markdown('<div class="chart-title">Previous Scores vs Performance</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+        fig3 = px.scatter(df,x="Previous Scores",y="Performance Index")
+        st.plotly_chart(fig3,use_container_width=True)
 
-    # ---------------------------------------------
-    # 3 Previous Scores vs Performance
-    # ---------------------------------------------
+        st.markdown('<div class="chart-desc">Students with higher previous scores tend to maintain performance.</div>', unsafe_allow_html=True)
 
-    st.subheader("Previous Scores vs Performance")
+    with col4:
 
-    
-    fig3 = px.scatter(
-    df,
-    x="Previous Scores",
-    y="Performance Index",
-    title="Relationship Between Previous Scores and Final Performance"
-)
+        st.markdown('<div class="chart-title">Practice Papers vs Performance</div>', unsafe_allow_html=True)
 
-    st.plotly_chart(fig3, use_container_width=True)
+        paper_perf = df.groupby("Sample Question Papers Practiced")["Performance Index"].mean().reset_index()
 
-    st.caption(
-        "Insight: Students who performed well previously are more likely to achieve higher performance again."
-    )
+        fig4 = px.line(paper_perf,x="Sample Question Papers Practiced",y="Performance Index",markers=True)
+        st.plotly_chart(fig4,use_container_width=True)
 
-    st.markdown("---")
+        st.markdown('<div class="chart-desc">Practicing more papers improves exam readiness.</div>', unsafe_allow_html=True)
 
-    # ---------------------------------------------
-    # 4 Practice Papers vs Performance
-    # ---------------------------------------------
-
-    st.subheader("Practice Papers vs Performance")
-
-    paper_perf = df.groupby("Sample Question Papers Practiced")["Performance Index"].mean().reset_index()
-
-    fig4 = px.line(
-        paper_perf,
-        x="Sample Question Papers Practiced",
-        y="Performance Index",
-        markers=True,
-        title="Effect of Practice Papers on Performance"
-    )
-
-    st.plotly_chart(fig4, use_container_width=True)
-
-    st.caption(
-        "Insight: Solving more practice papers helps students improve their academic performance."
-    )
 
 # ===================================================
 # PREDICTION PAGE
@@ -248,98 +232,25 @@ with home_tab:
 
 with pred_tab:
 
-    st.subheader("Prediction System Overview")
-
-    col1, col2 = st.columns(2, gap="large")
+    col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("""
-        <div class="card">
-        <h4>Dataset Overview</h4>
-        <p>Student dataset containing study behaviour and academic performance indicators.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        hours = st.number_input("Hours Studied",1.0,9.0,5.0,key="hours_input")
+        prev = st.number_input("Previous Scores",40.0,100.0,70.0,key="prev_scores")
+        extra = st.selectbox("Extracurricular Activities",["Yes","No"],key="extra_activity")
 
     with col2:
-        st.markdown("""
-        <div class="card">
-        <h4>Machine Learning Model</h4>
-        <p>Linear Regression model trained to predict performance index.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        sleep = st.number_input("Sleep Hours",4.0,10.0,7.0,key="sleep_hours")
+        papers = st.number_input("Practice Papers Solved",0.0,9.0,3.0,key="practice_papers")
 
-    col3, col4 = st.columns(2, gap="large")
+    st.write("")
 
-    with col3:
-        st.markdown("""
-        <div class="card">
-        <h4>Key Input Features</h4>
-        <p>Hours studied, sleep hours, previous scores, activities and practice papers.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    predict = st.button("Predict")
 
-    with col4:
-        st.markdown("""
-        <div class="card">
-        <h4>Prediction Objective</h4>
-        <p>Estimate expected academic performance based on study patterns.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    if predict:
 
-    st.markdown("---")
+        extra_val = 1 if extra=="Yes" else 0
+        features = np.array([[hours,prev,extra_val,sleep,papers]])
+        prediction = model.predict(features)[0]
 
-    st.header("Predict Student Performance")
-
-    st.markdown("""
-    <div class="note-card">
-    Enter student academic details below. The trained machine learning model will predict the expected performance index.
-    </div>
-    """, unsafe_allow_html=True)
-
-# ---------------------------------------------------
-# INPUTS WITH VALIDATION
-# ---------------------------------------------------
-#####Hours studied ≈ 1 – 9
-###Sleep hours ≈ 4 – 10
-    hours = st.number_input("Hours Studied", min_value=0.0, max_value=12.0)
-
-    prev = st.number_input("Previous Scores", min_value=0.0, max_value=100.0, step=0.5)
-
-    extra = st.selectbox("Extracurricular Activities",["Select","Yes","No"])
-
-    sleep = st.number_input("Sleep Hours", min_value=0.0, max_value=24.0)
-
-    papers = st.number_input("Practice Papers Solved", min_value=0.0, max_value=9.0)
-
-# ---------------------------------------------------
-# PREDICTION
-# ---------------------------------------------------
-
-    if st.button("Predict"):
-
-        if extra == "Select":
-
-            st.warning("Please select extracurricular activities")
-
-        else:
-
-            extra_val = 1 if extra=="Yes" else 0
-
-            features = np.array([[hours, prev, extra_val, sleep, papers]])
-
-            prediction = model.predict(features)
-
-            prediction = max(0, prediction[0])
-
-            st.success(f"Predicted Performance Index: {prediction:.2f}")
-
-
-
-####| Feature                            | Valid Range |
-##| ---------------------------------- | ----------- |
-#| Hours Studied                      | 1 – 9       |
-#| Previous Scores                    | 40 – 100    |
-#| Extracurricular Activities         | Yes / No    |
-#| Sleep Hours                        | 4 – 10      |
-#| Practice Papers                    | 0 – 9       |
-#| **Performance Index (prediction)** | **0 – 100** |
+        st.success(f"Predicted Student Performance: {prediction:.2f}")
